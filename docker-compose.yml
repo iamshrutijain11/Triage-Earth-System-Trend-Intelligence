@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  triage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: triage:latest
+    container_name: triage-app
+    ports:
+      - "8501:8501"
+    environment:
+      - CDSE_CLIENT_ID=${CDSE_CLIENT_ID:-}
+      - CDSE_CLIENT_SECRET=${CDSE_CLIENT_SECRET:-}
+      - CDSE_USERNAME=${CDSE_USERNAME:-}
+      - CDSE_PASSWORD=${CDSE_PASSWORD:-}
+    volumes:
+      - ./data/processed:/app/data/processed
+      - ./data/cache:/app/data/cache
+    restart: unless-stopped
+

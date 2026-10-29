@@ -37,7 +37,7 @@ Given any geographic bounding box (`bbox`) and event date (`flood_date`), Triage
                                       │
                                       ▼
                          [ Terrain & Physics Filter ]
-               DEM Slope + HAND Drainage + Radar Shadow & Layover -> cant_see
+                DEM Slope + HAND Drainage + Radar Shadow & Layover -> cant_see
                                       │
                                       ▼
                         [ Infrastructure Damage Overlay ]
@@ -45,7 +45,7 @@ Given any geographic bounding box (`bbox`) and event date (`flood_date`), Triage
                                       │
                                       ▼
                        [ Topological Cut-Off Analysis ]
-               Road Network Graph + Monte Carlo Edge Failure (N=200)
+                Road Network Graph + Monte Carlo Edge Failure (N=200)
                                       │
                                       ▼
                       [ Hydrological Flowpath & Arrival ]
@@ -62,17 +62,54 @@ Given any geographic bounding box (`bbox`) and event date (`flood_date`), Triage
 
 ---
 
-## Installation & Setup
+## Project Structure & Module Integration
+
+The repository integrates 4 modular domains with backwards-compatible shims:
+
+| Directory | Domain & Role | Key Responsibilities |
+| :--- | :--- | :--- |
+| [`p1_data/`](p1_data/) | **Person 1**: Data Ingestion | Sentinel-1/2, Copernicus DEM, OSM, offline caching, and global orchestrator ([`pipeline.py`](p1_data/pipeline.py)). |
+| [`p2_ai/`](p2_ai/) | **Person 2**: AI Detection | SAR change detection, InSAR coherence fallback, 5-ch U-Net, 4-way sensor fusion. |
+| [`p3_terrain/`](p3_terrain/) | **Person 3**: Hydrology & Rescue | Slope/HAND filtering, radar shadow masking, D8 flowpath routing, HLZ & rescue ranking. |
+| [`p4_app/`](p4_app/) | **Person 4**: Damage & Tactical UI | OSM damage overlay, road graph Monte Carlo cut-off, bilingual SitReps, Streamlit app. |
+| [`shared/`](shared/) | Shared Utilities | Common constants, raster grid transformations, and GeoJSON I/O helpers. |
+| [`src/`](src/) | Backward Compatibility | Re-export shims ensuring legacy imports (`from src.pipeline import run`, etc.) function seamlessly. |
+
+---
+
+## Quick Deployment Options
+
+### Option 1: Docker (Recommended for Cloud & Servers)
+Build and launch with Docker Compose (includes all required geospatial C-libraries and WeasyPrint):
+```bash
+docker compose up --build
+```
+Then open `http://localhost:8501` in your browser.
+
+Or build and run the Docker container directly:
+```bash
+docker build -t triage .
+docker run -p 8501:8501 triage
+```
+
+### Option 2: Streamlit Community Cloud & Hugging Face Spaces
+- **Repository Entrypoint**: [`streamlit_app.py`](streamlit_app.py) is preconfigured at the root for zero-config one-click deployment.
+- **Python Package**: [`pyproject.toml`](pyproject.toml) and [`requirements.txt`](requirements.txt) are auto-detected by build runners.
+
+---
+
+## Local Installation & Setup
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.10+
 - Git
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/organization/triage.git
+git clone https://github.com/architavish05/triage.git
 cd triage
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ### 2. Configure Credentials (`.env`)
@@ -122,15 +159,22 @@ python run_case_study.py
 ### 3. Launch the Interactive Dashboard
 To launch the Streamlit decision-support application:
 ```bash
-streamlit run p4_app/app/app.py
+streamlit run streamlit_app.py
 ```
+*(Or alternatively `streamlit run app/main.py`)*
+
 Dashboard features:
 - Area & date picker with scenario presets
 - Multi-layer interactive Folium map (Flood, Debris, Damaged Assets, Cut-off Communities, HLZ Landing Zones, Flowpath)
 - Decision-support tables (Rescue priorities, Downstream arrival timeline)
 - Downloads: One-page bilingual situation reports (English & Nepali HTML/PDF), plain-text radio summaries, and GeoJSON bundles.
 
-### 4. Offline Field Kit Execution
+### 4. Run the Full Test Suite
+```bash
+pytest tests/ -v
+```
+
+### 5. Offline Field Kit Execution
 For air-gapped disaster operations without internet connectivity:
 ```python
 from p1_data.offline.prefetch import prefetch_region
