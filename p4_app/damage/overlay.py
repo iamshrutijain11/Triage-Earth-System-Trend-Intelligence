@@ -29,25 +29,7 @@ class DamageOverlayResult:
     summary: Dict[str, Any]             # Structured quantitative summary
 
 
-def coord_to_pixel(
-    lon: float,
-    lat: float,
-    transform: Tuple[float, float, float, float, float, float],
-    shape: Tuple[int, int],
-) -> Optional[Tuple[int, int]]:
-    """Convert geographic coordinates (WGS84 lon, lat) to raster (row, col) index.
-
-    Transform tuple format: (west, south, east, north, res_x, res_y)
-    """
-    west, south, east, north, res_x, res_y = transform
-    rows, cols = shape
-
-    if not (west <= lon <= east and south <= lat <= north):
-        return None
-
-    col = int(np.clip((lon - west) / max(res_x, 1e-12), 0, cols - 1))
-    row = int(np.clip((north - lat) / max(res_y, 1e-12), 0, rows - 1))
-    return row, col
+from shared.grid import coord_to_pixel
 
 
 def sample_points_along_line(
