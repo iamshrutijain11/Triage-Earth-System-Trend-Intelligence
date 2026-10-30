@@ -229,3 +229,71 @@ Every automated satellite disaster mapping pipeline possesses physical and opera
 ## License & Attribution Summary
 
 Licensed under the Apache License 2.0. All satellite data processed subject to Copernicus Open Access terms and OpenStreetMap ODbL.
+
+
+---
+
+## KuroSiwo Dataset Integration
+
+This project uses the **[Kuro Siwo](https://github.com/Orion-AI-Lab/KuroSiwo)** dataset (NeurIPS 2024) for U-Net flood detection training:
+
+```
+Dataset:  43 global flood events | 338B m² | 10m resolution | GRD + SLC
+Labels:   0 = background | 1 = permanent water | 2 = flood
+Download: data/kurosiwo/ (gitignored, see data/kurosiwo/README.md)
+Weights:  p2_ai/models/ (gitignored, see p2_ai/models/README.md)
+```
+
+```bash
+# Quick setup: download KuroSiwo and train
+git clone https://github.com/Orion-AI-Lab/KuroSiwo KuroSiwo_repo
+cd KuroSiwo_repo && ./scripts/download_kuro_siwo.sh ../data/kurosiwo/
+cd .. && jupyter notebook p2_ai/notebooks/01_unet_training.ipynb
+```
+
+**Citation**:
+```bibtex
+@inproceedings{bountos2024kurosiwo,
+  title   = {Kuro Siwo: 12 billion pixels of SAR imagery for global flood segmentation},
+  author  = {Bountos, Nikolaos Ioannis and Michail, Dimitrios and Papoutsis, Ioannis},
+  year    = {2024},
+  booktitle = {NeurIPS Datasets and Benchmarks}
+}
+```
+
+---
+
+## Canonical Run Folder Structure
+
+Each pipeline execution produces a run folder at `data/runs/{event}_{date}/`:
+
+```
+data/runs/trishuli_2026-08-26/
+├── grid.json                    # (P1) Raster grid metadata
+├── s1_pre.tif, s1_post.tif      # (P1) Sentinel-1 GeoTIFFs
+├── s2_pre.tif, s2_post.tif      # (P1) Sentinel-2 GeoTIFFs
+├── dem.tif                      # (P1) Copernicus DEM
+├── osm_buildings.geojson        # (P1) OSM building footprints
+├── osm_roads.geojson            # (P1) OSM road network
+├── osm_bridges.geojson          # (P1) OSM bridge points
+├── osm_places.geojson           # (P1) OSM places
+├── osm_hospitals.geojson        # (P1) OSM health facilities
+├── settlements.geojson          # (P1) Populated settlements
+├── flood_raw_conf.tif           # (P2) Raw flood confidence
+├── class.tif                    # (P2) Classified flood map
+├── slope.tif                    # (P3) DEM slope
+├── hand.tif                     # (P3) Height Above Nearest Drainage
+├── cant_see.tif                 # (P3) Radar shadow/layover mask
+├── flood_conf.tif               # (P3) Terrain-filtered confidence
+├── flowpath.geojson             # (P3) D8 downstream flow path
+├── landing_zones.geojson        # (P3) Helicopter landing zones
+├── trapped.csv                  # (P3) Trapped settlements + escape times
+├── assets_damage.geojson        # (P4) OSM assets with hit_prob
+├── damage_summary.json          # (P4) Damage statistics
+├── cutoff.csv                   # (P4) Cut-off probability per settlement
+├── summary.json                 # (P4) Full run summary
+├── report.pdf                   # (P4) Bilingual situation report
+├── sms.txt                      # (P4) VHF/SMS broadcast text
+├── emsr927_comparison/          # (P4) EMSR927 validation
+└── bundle/                      # (P1) Offline kit: MBTiles+GeoJSON+PDF+txt
+```

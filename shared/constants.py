@@ -27,3 +27,17 @@ FUSION_WEIGHT_UNET: float = 0.40
 FUSION_WEIGHT_SAR: float = 0.30
 FUSION_WEIGHT_COHERENCE: float = 0.15
 FUSION_WEIGHT_NDWI: float = 0.15
+
+# KuroSiwo U-Net Normalisation Statistics (training-time, Sentinel-1 IW GRD over land)
+# Source: Kuro Siwo dataset (Bountos et al., NeurIPS 2024)
+# https://github.com/Orion-AI-Lab/KuroSiwo
+SENTINEL1_VV_MEAN: float = -12.0   # dB
+SENTINEL1_VV_STD: float = 4.5      # dB
+SENTINEL1_VH_MEAN: float = -18.0   # dB
+SENTINEL1_VH_STD: float = 4.5      # dB
+SENTINEL1_SLOPE_MAX_DEG: float = 45.0  # degrees (max-normalisation)
+
+# KuroSiwo label schema
+KUROSIWO_LABEL_NO_WATER: int = 0
+KUROSIWO_LABEL_PERMANENT_WATER: int = 1
+KUROSIWO_LABEL_FLOOD: int = 2

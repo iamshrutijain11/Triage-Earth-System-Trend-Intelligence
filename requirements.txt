@@ -22,6 +22,11 @@ python-dotenv>=1.0.0
 sentinelsat>=1.2.0
 openeo>=0.20.0
 
+# KuroSiwo / HuggingFace Dataset Access
+huggingface_hub>=0.20.0
+webdataset>=0.2.86
+datasets>=2.16.0
+
 # UI, Visualization & Reporting
 streamlit>=1.25.0
 folium>=0.14.0

@@ -367,10 +367,20 @@ class UNetInferenceEngine:
                 f"Expected 5-channel input (5, H, W), got shape {input_tensor_5ch.shape}."
             )
 
+        _, h, w = input_tensor_5ch.shape
+        pad_h = (16 - h % 16) % 16
+        pad_w = (16 - w % 16) % 16
+        if pad_h > 0 or pad_w > 0:
+            padded_input = np.pad(input_tensor_5ch, ((0, 0), (0, pad_h), (0, pad_w)), mode="reflect")
+        else:
+            padded_input = input_tensor_5ch
+
         if self.backend == "onnxruntime":
-            return self._run_onnx(self._session, input_tensor_5ch)
+            prob = self._run_onnx(self._session, padded_input)
+            return prob[:h, :w] if (pad_h > 0 or pad_w > 0) else prob
         elif self.backend == "pytorch":
-            return self._run_pytorch(self._model, self._device, input_tensor_5ch)
+            prob = self._run_pytorch(self._model, self._device, padded_input)
+            return prob[:h, :w] if (pad_h > 0 or pad_w > 0) else prob
         else:
             return self._run_heuristic(input_tensor_5ch)
 
