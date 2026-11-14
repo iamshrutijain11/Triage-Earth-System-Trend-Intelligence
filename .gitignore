@@ -76,6 +76,6 @@ docs/figures/*.png
 docs/figures/*.jpg
 docs/figures/*.svg
 
-# Extra directories not in spec
-app/
-src/
+# Root legacy shims (optional)
+/app/
+/src/

@@ -1,8 +1,17 @@
-"""Triage | Flood damage from satellite data.
+"""
+TRIAGE — Earth System Trend Intelligence & Impact Explorer.
 
-Decision-support application for disaster response and evacuation prioritization.
+NASA Space Apps 2026: "Be An Earth System Trend Detective!"
+
+Unified multi-module platform featuring:
+- Module A: Earth Explorer
+- Module B: Trend Laboratory
+- Module C: Statistical Intelligence
+- Module D: Regional Trend Atlas
+- Module E: Impact Intelligence & Tactical Disaster Triage
 """
 
+from __future__ import annotations
 import sys
 import os
 from pathlib import Path
@@ -14,11 +23,11 @@ import numpy as np
 import streamlit as st
 from streamlit_folium import st_folium
 
-# Prepend project root and app directory to sys.path so package and components imports succeed
+# Ensure project root and package dirs are in sys.path
 app_dir = Path(__file__).resolve().parent
 repo_root = app_dir
 for candidate in (app_dir, app_dir.parent, app_dir.parent.parent):
-    if (candidate / "CONTRACT.md").exists() or (candidate / ".git").exists():
+    if (candidate / "CONTRACT.md").exists() or (candidate / ".git").exists() or (candidate / "pyproject.toml").exists():
         repo_root = candidate
         break
 
@@ -26,43 +35,23 @@ for p in (str(repo_root), str(app_dir), str(repo_root / "p4_app"), str(repo_root
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from p1_data.pipeline import run
+from nasa_data.catalog import NASA_CATALOG, REGIONAL_PRESETS
+from nasa_data.client import NASAClient
+from trend_engine.analyzer import TrendAnalyzer
+from trend_engine.visualization import build_timeseries_chart_data
+from trend_engine.classification import interpret_result
 
-try:
-    from p4_app.app.components import (
-        build_folium_map,
-        load_run_from_folder,
-        render_footer,
-        render_header,
-        render_kpi_row,
-        render_priority_villages_table,
-        render_tabs,
-    )
-except (ImportError, ModuleNotFoundError):
-    try:
-        from app.components import (
-            build_folium_map,
-            load_run_from_folder,
-            render_footer,
-            render_header,
-            render_kpi_row,
-            render_priority_villages_table,
-            render_tabs,
-        )
-    except (ImportError, ModuleNotFoundError):
-        from components import (
-            build_folium_map,
-            load_run_from_folder,
-            render_footer,
-            render_header,
-            render_kpi_row,
-            render_priority_villages_table,
-            render_tabs,
-        )
+from p4_app.app.views.v_explorer import render_explorer_view
+from p4_app.app.views.v_trend_lab import render_trend_lab_view
+from p4_app.app.views.v_statistics import render_statistics_view
+from p4_app.app.views.v_atlas import render_atlas_view
+from p4_app.app.views.v_impact import render_impact_view
+from p4_app.app.components import render_footer
 
 # Page configuration
 st.set_page_config(
-    page_title="Triage",
+    page_title="TRIAGE | Earth System Trend Intelligence",
+    page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -83,7 +72,6 @@ def _detect_cli_run_dir() -> Optional[str]:
             candidate = arg.split("=", 1)[1]
             if Path(candidate).exists():
                 return candidate
-        # Positional folder argument (e.g. `streamlit run app/main.py data/mock_run/`)
         clean_arg = arg.rstrip("/\\")
         if (
             arg not in ("streamlit", "run")
@@ -95,257 +83,150 @@ def _detect_cli_run_dir() -> Optional[str]:
     return None
 
 
-def _normalize_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalize outputs whether from pipeline in-memory execution or cached run folder."""
-    if "damage" in raw_data:
-        # From in-memory run(...)
-        damage = raw_data["damage"]
-        summary = damage.summary
-        bldgs = damage.damaged_buildings
-        roads = damage.damaged_roads
-        bridges = damage.damaged_bridges
-        priorities = raw_data.get("rescue_priorities", [])
-        hlz_geojson = raw_data.get("landing_zones_geojson", {"type": "FeatureCollection", "features": []})
-        trace_coords = raw_data["downstream_trace"].path_coords if raw_data.get("downstream_trace") else []
-        arrivals = raw_data.get("settlement_arrivals", [])
-        dry_islands = raw_data.get("dry_islands_count", 0)
-        sms_text = raw_data.get("sms_summary", "")
-        run_dir = raw_data.get("output_dir", None)
-        class_map = raw_data.get("class_map")
-        cant_see_mask = raw_data.get("cant_see_mask")
-        bbox = raw_data.get("bbox", (85.20, 27.80, 85.45, 28.15))
-        flood_date = raw_data.get("flood_date", "2026-08-26")
-        area_name = "Bhote Koshi - Trishuli Corridor, Nepal"
-    else:
-        # From load_run_from_folder
-        summary = raw_data.get("summary", {})
-        bldgs = raw_data.get("damaged_buildings", {"type": "FeatureCollection", "features": []})
-        roads = raw_data.get("damaged_roads", {"type": "FeatureCollection", "features": []})
-        bridges = raw_data.get("damaged_bridges", {"type": "FeatureCollection", "features": []})
-        priorities = raw_data.get("priorities", [])
-        hlz_geojson = raw_data.get("landing_zones_geojson", {"type": "FeatureCollection", "features": []})
-        trace_coords = raw_data.get("trace_coords", [])
-        arrivals = []
-        dry_islands = summary.get("dry_islands_count", 2)
-        sms_text = raw_data.get("sms_text", "")
-        run_dir = raw_data.get("run_dir", None)
-        class_map = raw_data.get("class_map")
-        cant_see_mask = raw_data.get("cant_see_mask")
-        bbox = raw_data.get("bbox", (85.20, 27.80, 85.45, 28.15))
-        flood_date = raw_data.get("flood_date", "2026-08-26")
-        area_name = raw_data.get("area_name", "Bhote Koshi - Trishuli Corridor, Nepal")
-
-    return {
-        "summary": summary,
-        "damaged_buildings": bldgs,
-        "damaged_roads": roads,
-        "damaged_bridges": bridges,
-        "priorities": priorities,
-        "landing_zones_geojson": hlz_geojson,
-        "trace_coords": trace_coords,
-        "settlement_arrivals": arrivals,
-        "dry_islands_count": dry_islands,
-        "sms_text": sms_text,
-        "run_dir": run_dir,
-        "class_map": class_map,
-        "cant_see_mask": cant_see_mask,
-        "bbox": bbox,
-        "flood_date": flood_date,
-        "area_name": area_name,
-    }
-
-
 def main() -> None:
-    # Check CLI directory on first load
-    cli_dir = _detect_cli_run_dir()
-    if cli_dir and "pipeline_results" not in st.session_state:
-        try:
-            cached_run = load_run_from_folder(cli_dir)
-            st.session_state["pipeline_results"] = cached_run
-            st.session_state["last_run_info"] = {
-                "area_name": cached_run.get("area_name", "Local Run"),
-                "flood_date": cached_run.get("flood_date", "2026-08-26"),
-            }
-        except Exception:
-            pass
+    # -------------------------------------------------------------------------
+    # 1. Sidebar Header & Navigation
+    # -------------------------------------------------------------------------
+    st.sidebar.title("🌍 TRIAGE")
+    st.sidebar.caption("NASA Space Apps 2026: Be An Earth System Trend Detective!")
+    st.sidebar.markdown("---")
 
-    # -------------------------------------------------------------
-    # Sidebar Controls (exact requested order)
-    # -------------------------------------------------------------
-    # 1. Area section
-    st.sidebar.markdown("### Area")
-    preset_options = [
-        "Bhote Koshi - Trishuli Corridor, Nepal",
-        "Custom bounding box",
-        "Mock run (data/mock_run)",
+    modules = [
+        "Module A: Earth Explorer",
+        "Module B: Trend Laboratory",
+        "Module C: Statistical Intelligence",
+        "Module D: Regional Trend Atlas",
+        "Module E: Impact & Tactical Triage",
     ]
-    preset = st.sidebar.selectbox("Scenario preset", preset_options)
 
-    if preset == "Bhote Koshi - Trishuli Corridor, Nepal":
-        default_bbox = (85.20, 27.80, 85.45, 28.15)
-        default_date = "2026-08-26"
-        area_label = "Bhote Koshi - Trishuli Corridor, Nepal"
-    elif preset == "Mock run (data/mock_run)":
-        default_bbox = (85.20, 27.80, 85.45, 28.15)
-        default_date = "2026-08-26"
-        area_label = "Mock Run (Trishuli Corridor)"
-    else:
-        default_bbox = (85.10, 27.70, 85.50, 28.20)
-        default_date = "2026-08-26"
-        area_label = "Custom Area"
+    # If CLI run directory was provided, default to Module E (Tactical Triage)
+    cli_dir = _detect_cli_run_dir()
+    default_module_idx = 4 if cli_dir else 1  # Default to Trend Lab or Triage
 
-    # Bbox in two rows: West/South, East/North
-    col_w, col_s = st.sidebar.columns(2)
-    min_lon = col_w.number_input("West", value=default_bbox[0], format="%.4f")
-    min_lat = col_s.number_input("South", value=default_bbox[1], format="%.4f")
-
-    col_e, col_n = st.sidebar.columns(2)
-    max_lon = col_e.number_input("East", value=default_bbox[2], format="%.4f")
-    max_lat = col_n.number_input("North", value=default_bbox[3], format="%.4f")
-
-    # 2. Event section
-    st.sidebar.markdown("### Event")
-    flood_date = st.sidebar.text_input("Flood date", value=default_date)
-
-    # 3. Mode section
-    st.sidebar.markdown("### Mode")
-    offline_mode = st.sidebar.checkbox("Offline mode (use cached data only)", value=True)
-
-    # 4. Full-width primary button
-    run_analysis = st.sidebar.button("Run analysis", type="primary", use_container_width=True)
-
-    # Execution trigger
-    if run_analysis:
-        bbox = (min_lon, min_lat, max_lon, max_lat)
-        if preset == "Mock run (data/mock_run)" and Path("data/mock_run").exists():
-            with st.status("Loading cached mock run...", expanded=True) as status:
-                status.write("Fetching data")
-                status.write("Detecting flood")
-                status.write("Terrain filter")
-                status.write("Damage overlay")
-                status.write("Cut-off analysis")
-                status.write("Rescue priority")
-                status.write("Report")
-                results = load_run_from_folder("data/mock_run")
-                status.update(label="Analysis complete", state="complete", expanded=False)
-        else:
-            with st.status("Executing disaster intelligence pipeline...", expanded=True) as status:
-                status.write("Fetching data")
-                time.sleep(0.04)
-                status.write("Detecting flood")
-                time.sleep(0.04)
-                status.write("Terrain filter")
-                time.sleep(0.04)
-                status.write("Damage overlay")
-                time.sleep(0.04)
-                status.write("Cut-off analysis")
-                time.sleep(0.04)
-                status.write("Rescue priority")
-                time.sleep(0.04)
-                status.write("Report")
-
-                out_dir = Path("data/processed") / f"{flood_date}_{min_lon:.2f}_{min_lat:.2f}"
-                results = run(bbox=bbox, flood_date=flood_date, offline=offline_mode, output_dir=out_dir)
-
-                # Persist cached rasters & geojsons for folder retrieval
-                try:
-                    np.savez_compressed(
-                        out_dir / "hazard_grid.npz",
-                        class_map=results["class_map"],
-                        cant_see_mask=results["cant_see_mask"],
-                        bbox=np.array(results["bbox"]),
-                    )
-                    with open(out_dir / "metadata.json", "w", encoding="utf-8") as f:
-                        json.dump({
-                            "bbox": list(results["bbox"]),
-                            "flood_date": results["flood_date"],
-                            "area_name": area_label,
-                        }, f)
-                    with open(out_dir / "geojson" / "landing_zones.geojson", "w", encoding="utf-8") as f:
-                        json.dump(results["landing_zones_geojson"], f)
-                    if results.get("downstream_trace"):
-                        with open(out_dir / "geojson" / "downstream_trace.json", "w", encoding="utf-8") as f:
-                            json.dump(results["downstream_trace"].path_coords, f)
-                    if results.get("rescue_priorities"):
-                        with open(out_dir / "geojson" / "rescue_priorities.json", "w", encoding="utf-8") as f:
-                            json.dump([p.__dict__ for p in results["rescue_priorities"]], f)
-                except Exception:
-                    pass
-
-                status.update(label="Analysis complete", state="complete", expanded=False)
-
-        st.session_state["pipeline_results"] = results
-        st.session_state["last_run_info"] = {
-            "area_name": area_label,
-            "flood_date": flood_date,
-        }
-
-    # -------------------------------------------------------------
-    # Main Dashboard Body
-    # -------------------------------------------------------------
-    last_info = st.session_state.get("last_run_info", {})
-    render_header(
-        area_name=last_info.get("area_name"),
-        flood_date=last_info.get("flood_date"),
+    selected_module = st.sidebar.radio(
+        "Navigation",
+        modules,
+        index=default_module_idx,
     )
 
-    if "pipeline_results" not in st.session_state:
-        # Empty state before first run
-        st.info("Select an area and date, then click Run analysis")
-        render_footer()
-        return
+    st.sidebar.markdown("---")
 
-    # Normalized data extraction
-    data = _normalize_data(st.session_state["pipeline_results"])
+    # -------------------------------------------------------------------------
+    # 2. Global Parameter Controls
+    # -------------------------------------------------------------------------
+    st.sidebar.markdown("### 🛰️ NASA Observation Query")
 
-    # KPI Row
-    render_kpi_row(
-        summary=data["summary"],
-        priorities=data["priorities"],
-        dry_islands_count=data["dry_islands_count"],
+    var_options = list(NASA_CATALOG.keys())
+    var_labels = [f"{NASA_CATALOG[k].display_name} ({NASA_CATALOG[k].category})" for k in var_options]
+    selected_var_idx = st.sidebar.selectbox(
+        "Environmental Variable",
+        range(len(var_options)),
+        format_func=lambda i: var_labels[i],
+        index=0,
+    )
+    selected_var_id = var_options[selected_var_idx]
+
+    region_options = list(REGIONAL_PRESETS.keys())
+    region_labels = [f"{REGIONAL_PRESETS[k]['name']}" for k in region_options]
+    selected_region_idx = st.sidebar.selectbox(
+        "Geographic Target",
+        range(len(region_options)),
+        format_func=lambda i: region_labels[i],
+        index=0,
+    )
+    selected_region_id = region_options[selected_region_idx]
+
+    # Time span
+    st.sidebar.markdown("### ⏱️ Time Period")
+    year_range = st.sidebar.slider("Observation Range", min_value=1980, max_value=2025, value=(1985, 2024))
+
+    st.sidebar.markdown("---")
+    st.sidebar.caption("Data Source: NASA Earth Observing System (GPM, AIRS, SMAP, MERRA-2)")
+
+    # -------------------------------------------------------------------------
+    # 3. Data Retrieval & Statistical Engine Computation
+    # -------------------------------------------------------------------------
+    client = NASAClient()
+    series_data = client.fetch_time_series(
+        variable_id=selected_var_id,
+        region_id=selected_region_id,
+        start_year=year_range[0],
+        end_year=year_range[1],
     )
 
-    # Main Area: Map (65%) and Priority Villages Table (35%)
-    col_map, col_table = st.columns([65, 35])
+    timestamps = series_data["timestamps"]
+    values = series_data["values"]
+    var_meta = NASA_CATALOG[selected_var_id]
 
-    with col_map:
-        m = build_folium_map(
-            bbox=data["bbox"],
-            class_map=data["class_map"],
-            cant_see_mask=data["cant_see_mask"],
-            damaged_buildings=data["damaged_buildings"],
-            damaged_roads=data["damaged_roads"],
-            damaged_bridges=data["damaged_bridges"],
-            priorities=data["priorities"],
-            landing_zones_geojson=data["landing_zones_geojson"],
-            downstream_coords=data["trace_coords"],
-        )
-        st_folium(
-            m,
-            height=620,
-            use_container_width=True,
-            returned_objects=[],
-            key="triage_tactical_map",
+    analyzer = TrendAnalyzer(alpha=0.05)
+    trend_result = analyzer.analyze(
+        timestamps=timestamps,
+        values=values,
+        variable_name=var_meta.display_name,
+        dataset=var_meta.dataset_name,
+        unit=var_meta.unit,
+        is_seasonal=True,
+        period=12,
+        slope_per="decade",
+        observation_period=f"{year_range[0]}-01 to {year_range[1]}-12",
+    )
+
+    viz_data = build_timeseries_chart_data(timestamps, values, trend_result)
+
+    interpretation = interpret_result(
+        variable_name=trend_result.variable_name,
+        trend_direction=trend_result.trend_direction,
+        sens_slope=trend_result.sens_slope,
+        slope_unit=trend_result.slope_unit,
+        p_value=trend_result.p_value,
+        alpha=trend_result.significance_threshold,
+        ci_lower=trend_result.ci_lower,
+        ci_upper=trend_result.ci_upper,
+        missing_pct=trend_result.missing_data_pct,
+        autocorrelation_corrected=bool(trend_result.autocorrelation_significant),
+    )
+
+    # Tactical triage run directory
+    run_dir_str = cli_dir or "data/runs/trishuli_2026-08-26"
+    if not Path(run_dir_str).exists():
+        run_dir_str = "data/mock_run"
+
+    # -------------------------------------------------------------------------
+    # 4. View Routing
+    # -------------------------------------------------------------------------
+    if selected_module == "Module A: Earth Explorer":
+        render_explorer_view(
+            selected_var_id=selected_var_id,
+            selected_region_id=selected_region_id,
         )
 
-    with col_table:
-        render_priority_villages_table(priorities=data["priorities"])
+    elif selected_module == "Module B: Trend Laboratory":
+        render_trend_lab_view(
+            series_data=series_data,
+            trend_result=trend_result,
+            viz_data=viz_data,
+        )
 
-    # Detail Tabs
-    render_tabs(
-        summary=data["summary"],
-        damaged_buildings=data["damaged_buildings"],
-        damaged_roads=data["damaged_roads"],
-        damaged_bridges=data["damaged_bridges"],
-        landing_zones_geojson=data["landing_zones_geojson"],
-        downstream_coords=data["trace_coords"],
-        settlement_arrivals=data["settlement_arrivals"],
-        sms_text=data["sms_text"],
-        run_dir=data["run_dir"],
-        flood_date=data["flood_date"],
-    )
+    elif selected_module == "Module C: Statistical Intelligence":
+        render_statistics_view(
+            trend_result=trend_result,
+            interpretation_text=interpretation,
+        )
 
-    # Footer
+    elif selected_module == "Module D: Regional Trend Atlas":
+        render_atlas_view(
+            selected_var_id=selected_var_id,
+            selected_region_id=selected_region_id,
+        )
+
+    elif selected_module == "Module E: Impact & Tactical Triage":
+        render_impact_view(
+            trend_result=trend_result,
+            region_name=REGIONAL_PRESETS[selected_region_id]["name"],
+            run_dir_str=run_dir_str,
+        )
+
+    # Common footer
     render_footer()
 
 
