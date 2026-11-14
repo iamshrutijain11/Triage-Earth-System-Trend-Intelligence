@@ -22,7 +22,7 @@ __version__ = "1.0.0"
 
 from trend_engine.models import TrendResult, VisualizationData
 from trend_engine.analyzer import TrendAnalyzer
-from trend_engine.api import analyze_variable, compare_regions, analyze_spatial_grid
+from trend_engine.api import analyze_variable, analyze_normalized_series, compare_regions, analyze_spatial_grid
 from trend_engine.impact import ImpactAssessment, assess_climate_trend_impact
 
 __all__ = [
@@ -31,6 +31,7 @@ __all__ = [
     "VisualizationData",
     "ImpactAssessment",
     "analyze_variable",
+    "analyze_normalized_series",
     "compare_regions",
     "analyze_spatial_grid",
     "assess_climate_trend_impact",

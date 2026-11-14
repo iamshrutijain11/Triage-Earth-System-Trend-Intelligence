@@ -101,6 +101,45 @@ def analyze_variable(
     return output
 
 
+def analyze_normalized_series(
+    series: Any,
+    slope_per: str = "decade",
+    alpha: float = 0.05,
+    include_visualization: bool = True,
+) -> Dict[str, Any]:
+    """Analyze a NormalizedObservationSeries directly from the NASA data acquisition layer.
+
+    Parameters
+    ----------
+    series : NormalizedObservationSeries
+        Normalized series containing timestamps, values, variable, dataset, unit.
+    slope_per : str
+        Unit time scaling: "decade", "year", "month", or "step".
+    alpha : float
+        Significance threshold.
+    include_visualization : bool
+        Whether to generate structured visualization data.
+
+    Returns
+    -------
+    dict with "result", "interpretation", and "visualization".
+    """
+    is_seasonal = (series.temporal_resolution.lower() == "monthly")
+    return analyze_variable(
+        timestamps=series.timestamps,
+        values=series.values,
+        variable_name=series.variable_name,
+        dataset=series.dataset_name,
+        unit=series.unit,
+        is_seasonal=is_seasonal,
+        period=12 if is_seasonal else 1,
+        slope_per=slope_per,
+        alpha=alpha,
+        observation_period=series.actual_observation_period,
+        include_visualization=include_visualization,
+    )
+
+
 def compare_regions(
     region_analyses: List[Dict[str, Any]],
     correction_method: str = "fdr",

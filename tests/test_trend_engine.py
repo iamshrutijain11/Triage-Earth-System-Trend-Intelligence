@@ -374,3 +374,60 @@ def test_analyze_spatial_grid_api():
     assert len(out["corrected_p_values"]) == 3
     assert "visualization" in out
     assert out["visualization"]["grid_slopes"] is not None
+
+
+
+def test_analyze_normalized_series_integration():
+    """Verify end-to-end integration with NormalizedObservationSeries and challenge output contract."""
+    from trend_engine.api import analyze_normalized_series
+    from nasa_data.api import fetch_historical_data, ObservationRequest
+
+    req = ObservationRequest(
+        dataset_id="nasa_power",
+        variable_id="temperature_2m",
+        latitude=27.95,
+        longitude=85.32,
+        start_year=1990,
+        end_year=2020,
+        region_id="trishuli_himalaya",
+    )
+    series = fetch_historical_data(req)
+    out = analyze_normalized_series(series, slope_per="decade", include_visualization=True)
+
+    assert "result" in out
+    assert "interpretation" in out
+    assert "visualization" in out
+
+    r = out["result"]
+
+    # Explicit challenge-required keys
+    challenge_required_keys = [
+        "variable_name",
+        "dataset",
+        "measurement_unit",
+        "observation_count",
+        "observation_period",
+        "trend_direction",
+        "sens_slope",
+        "slope_unit",
+        "mk_statistic",
+        "p_value",
+        "confidence_interval",
+        "statistical_significance",
+        "missing_data_percentage",
+        "analysis_method",
+        "methodological_limitations",
+    ]
+
+    for key in challenge_required_keys:
+        assert key in r, f"Key '{key}' missing from challenge required output contract!"
+
+    # Verify structured visualization elements
+    viz = out["visualization"]
+    assert "timestamps" in viz
+    assert "values" in viz
+    assert "trend_line_x" in viz
+    assert "trend_line_y" in viz
+    assert "anomalies" in viz
+    assert "ci_upper_band" in viz
+    assert "ci_lower_band" in viz

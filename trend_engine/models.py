@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field, asdict
-from typing import Optional, Literal
+from typing import Optional, Literal, Tuple, Dict, Any
 
 
 @dataclass
@@ -60,9 +60,34 @@ class TrendResult:
     adjusted_p_value: Optional[float] = None
     multiple_testing_method: Optional[str] = None
 
-    def to_dict(self) -> dict:
-        """Serialize to dictionary for JSON/API output."""
-        return asdict(self)
+    @property
+    def measurement_unit(self) -> str:
+        """Alias matching NASA challenge specification."""
+        return self.unit
+
+    @property
+    def confidence_interval(self) -> Tuple[float, float]:
+        """(ci_lower, ci_upper) tuple at ci_level confidence."""
+        return (self.ci_lower, self.ci_upper)
+
+    @property
+    def statistical_significance(self) -> bool:
+        """Alias matching NASA challenge specification."""
+        return self.is_statistically_significant
+
+    @property
+    def missing_data_percentage(self) -> float:
+        """Alias matching NASA challenge specification."""
+        return self.missing_data_pct
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to dictionary for JSON/API output with all challenge-specified fields."""
+        d = asdict(self)
+        d["measurement_unit"] = self.measurement_unit
+        d["confidence_interval"] = [self.ci_lower, self.ci_upper]
+        d["statistical_significance"] = self.statistical_significance
+        d["missing_data_percentage"] = self.missing_data_percentage
+        return d
 
     def to_json(self, indent: int = 2) -> str:
         """Serialize to JSON string."""
