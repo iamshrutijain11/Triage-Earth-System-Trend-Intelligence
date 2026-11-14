@@ -12,8 +12,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from p1_data.fetch.cache import get_cache_path
-from p1_data.fetch.exceptions import SceneNotFoundError
+from backend.triage.fetch.cache import get_cache_path
+from backend.triage.fetch.exceptions import SceneNotFoundError
 
 logger = logging.getLogger(__name__)
 

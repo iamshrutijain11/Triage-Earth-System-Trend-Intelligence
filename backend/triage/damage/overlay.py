@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from p2_ai.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
+from backend.triage.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
 
 logger = logging.getLogger(__name__)
 

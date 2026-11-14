@@ -7,8 +7,8 @@ Includes mandatory Copernicus and OSM attribution tag on footer.
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from p3_terrain.rescue.landing_zones import LandingZoneCandidate
-from p3_terrain.rescue.trapped_risk import RescuePriorityItem
+from backend.triage.rescue.landing_zones import LandingZoneCandidate
+from backend.triage.rescue.trapped_risk import RescuePriorityItem
 
 ATTRIBUTION_SHORT = (
     "Contains modified Copernicus Sentinel data 2026. "

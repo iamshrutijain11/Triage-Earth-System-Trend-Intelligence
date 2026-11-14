@@ -16,8 +16,8 @@ from typing import Any, Dict, Optional, Tuple
 import numpy as np
 from dotenv import load_dotenv
 
-from p1_data.fetch.cache import get_cache_path
-from p1_data.fetch.exceptions import (
+from backend.triage.fetch.cache import get_cache_path
+from backend.triage.fetch.exceptions import (
     CloudCoverExceededError,
     CredentialsError,
     SceneNotFoundError,

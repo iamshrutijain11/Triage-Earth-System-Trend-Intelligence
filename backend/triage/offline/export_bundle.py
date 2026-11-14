@@ -16,9 +16,9 @@ import zipfile
 import numpy as np
 from PIL import Image
 
-from p4_app.damage.overlay import save_damage_geojson
-from p4_app.network.priority import export_cutoff_geojson
-from p4_app.report.sms_summary import ATTRIBUTION_SHORT
+from backend.triage.damage.overlay import save_damage_geojson
+from backend.triage.network.priority import export_cutoff_geojson
+from backend.triage.report.sms_summary import ATTRIBUTION_SHORT
 
 logger = logging.getLogger(__name__)
 

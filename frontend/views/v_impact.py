@@ -28,7 +28,7 @@ try:
         render_tabs,
     )
 except (ImportError, ModuleNotFoundError):
-    from p4_app.app.components import (
+    from frontend.components import (
         load_run_from_folder,
         build_folium_map,
         render_kpi_row,

@@ -1,7 +1,7 @@
 """Hydrological flow path modeling and arrival time tracing modules."""
 
-from p3_terrain.flowpath import trace
-from p3_terrain.flowpath.trace import (
+from backend.triage.flowpath import trace
+from backend.triage.flowpath.trace import (
     DownstreamTrace,
     SettlementArrival,
     buffer_flow_path,

@@ -438,9 +438,9 @@ def export_downstream_trace_json(
 def main(run_dir_str: str = "data/mock_run") -> None:
     """CLI runner to execute D8 depression filling and flowpath tracing against a run directory."""
     try:
-        from p1_data.fetch.dem import generate_synthetic_dem
+        from backend.triage.fetch.dem import generate_synthetic_dem
     except ImportError:
-        from src.fetch.dem import generate_synthetic_dem
+        from backend.triage.fetch.dem import generate_synthetic_dem
 
     run_dir = Path(run_dir_str)
     if not run_dir.exists():

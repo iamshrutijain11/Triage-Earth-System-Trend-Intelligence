@@ -1,6 +1,6 @@
 """Post-hoc evaluation modules."""
 
-from p4_app.eval.compare_emsr927 import (
+from backend.triage.eval.compare_emsr927 import (
     EMSR927ComparisonResult,
     compare_with_emsr927,
     generate_emsr927_ground_truth,

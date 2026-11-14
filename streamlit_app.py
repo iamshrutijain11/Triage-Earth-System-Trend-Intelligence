@@ -17,7 +17,7 @@ for p in (str(root_dir), str(root_dir / "frontend"), str(root_dir / "backend")):
 try:
     from frontend.app import main
 except (ImportError, ModuleNotFoundError):
-    from p4_app.app.main import main
+    from frontend.app import main
 
 if __name__ == "__main__":
     main()

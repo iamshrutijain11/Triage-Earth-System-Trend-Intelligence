@@ -3,7 +3,7 @@
 from typing import Any, Dict, Optional, Tuple
 import numpy as np
 
-from p3_terrain.terrain.hand_slope import (
+from backend.triage.terrain.hand_slope import (
     TerrainFilterResult,
     compute_hand,
     compute_slope,
@@ -12,7 +12,7 @@ from p3_terrain.terrain.hand_slope import (
     filter_impossible_flood,
     save_raster,
 )
-from p3_terrain.terrain.shadow_mask import (
+from backend.triage.terrain.shadow_mask import (
     RadarOcclusionResult,
     build_cant_see_mask,
     compute_radar_shadow_layover,

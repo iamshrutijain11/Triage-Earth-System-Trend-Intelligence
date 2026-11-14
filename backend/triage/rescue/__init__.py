@@ -4,21 +4,21 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
-from p3_terrain.rescue.dry_islands import (
+from backend.triage.rescue.dry_islands import (
     check_settlement_on_dry_island,
     identify_dry_islands,
 )
-from p3_terrain.rescue.escape_time import (
+from backend.triage.rescue.escape_time import (
     EscapeTimeCheck,
     compute_high_ground_mask,
     evaluate_settlement_escape_time,
 )
-from p3_terrain.rescue.landing_zones import (
+from backend.triage.rescue.landing_zones import (
     LandingZoneCandidate,
     detect_landing_zones,
     export_landing_zones_geojson,
 )
-from p3_terrain.rescue.trapped_risk import (
+from backend.triage.rescue.trapped_risk import (
     DEFAULT_HOUSEHOLD_SIZE,
     RescuePriorityItem,
     compute_rescue_priorities,

@@ -38,8 +38,8 @@ from typing import Dict, Optional, Tuple
 
 import numpy as np
 
-from p2_ai.detect.coherence import DebrisDetectionResult
-from p2_ai.detect.sar_change import SARWaterDetectionResult
+from backend.triage.detect.coherence import DebrisDetectionResult
+from backend.triage.detect.sar_change import SARWaterDetectionResult
 
 logger = logging.getLogger(__name__)
 

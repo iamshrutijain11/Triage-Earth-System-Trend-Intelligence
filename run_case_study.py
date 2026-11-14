@@ -5,7 +5,7 @@ post-hoc validation against Copernicus EMS EMSR927.
 
 KuroSiwo Dataset Integration
 -----------------------------
-The U-Net flood detector (p2_ai/detect/unet.py) is trained on the **Kuro Siwo**
+The U-Net flood detector (backend.triage/detect/unet.py) is trained on the **Kuro Siwo**
 benchmark (NeurIPS 2024):
     Repo:   https://github.com/Orion-AI-Lab/KuroSiwo
     HF:     https://huggingface.co/datasets/orion-ai-lab/Kuro-Siwo-Webdataset
@@ -13,8 +13,8 @@ benchmark (NeurIPS 2024):
 
 To train with KuroSiwo data before running this script:
     1. Download:  see data/kurosiwo/README.md
-    2. Train:     jupyter notebook p2_ai/notebooks/01_unet_training.ipynb
-    3. Export:    python -c "from p2_ai.detect.unet import export_to_onnx; export_to_onnx('p2_ai/models/unet_flood.onnx')"
+    2. Train:     jupyter notebook backend.triage/notebooks/01_unet_training.ipynb
+    3. Export:    python -c "from backend.triage.detect.unet import export_to_onnx; export_to_onnx('backend.triage/models/unet_flood.onnx')"
 
 Usage
 -----
@@ -35,8 +35,8 @@ repo_root = Path(__file__).resolve().parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from p1_data.pipeline import run
-from p4_app.eval.compare_emsr927 import compare_with_emsr927
+from backend.triage.pipeline import run
+from backend.triage.eval.compare_emsr927 import compare_with_emsr927
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,7 +45,7 @@ logging.basicConfig(
 logger = logging.getLogger("case_study")
 
 # ─── KuroSiwo model availability check ───────────────────────────────────────
-_MODELS_DIR = repo_root / "p2_ai" / "models"
+_MODELS_DIR = repo_root / "backend.triage" / "models"
 _ONNX_PATH = _MODELS_DIR / "unet_flood.onnx"
 _PTH_PATH = _MODELS_DIR / "unet_flood_best.pth"
 
@@ -57,9 +57,9 @@ def _check_kurosiwo_model() -> str:
     if _PTH_PATH.exists():
         return "pytorch"
     logger.warning(
-        "No trained KuroSiwo weights found in p2_ai/models/. "
+        "No trained KuroSiwo weights found in backend.triage/models/. "
         "Using numpy physics heuristic fallback. "
-        "Train with p2_ai/notebooks/01_unet_training.ipynb for real predictions."
+        "Train with backend.triage/notebooks/01_unet_training.ipynb for real predictions."
     )
     return "numpy_heuristic (fallback)"
 
@@ -86,15 +86,15 @@ def _mirror_to_runs_folder(processed_dir: Path, runs_dir: Path) -> None:
             ("assets_damage.geojson", "assets_damage.geojson"),
             ("cutoff_settlements.geojson", "cutoff_settlements.geojson"),
         ]:
-            src = geojson_src / src_file
-            if src.exists():
-                shutil.copy2(src, runs_dir / dst_name)
+            backend.triage = geojson_src / src_file
+            if backend.triage.exists():
+                shutil.copy2(backend.triage, runs_dir / dst_name)
 
     # Top-level summary & reports
     for src_file in ["summary.json", "cutoff.csv"]:
-        src = processed_dir / src_file
-        if src.exists():
-            shutil.copy2(src, runs_dir / src_file)
+        backend.triage = processed_dir / src_file
+        if backend.triage.exists():
+            shutil.copy2(backend.triage, runs_dir / src_file)
 
     # Reports → report.pdf + sms.txt
     reports_src = processed_dir / "reports"
@@ -103,9 +103,9 @@ def _mirror_to_runs_folder(processed_dir: Path, runs_dir: Path) -> None:
             ("sitrep_en.pdf", "report.pdf"),
             ("sitrep_sms.txt", "sms.txt"),
         ]:
-            src = reports_src / src_file
-            if src.exists():
-                shutil.copy2(src, runs_dir / dst_name)
+            backend.triage = reports_src / src_file
+            if backend.triage.exists():
+                shutil.copy2(backend.triage, runs_dir / dst_name)
 
     # EMSR927 validation
     emsr_src = processed_dir / "eval_emsr927"
@@ -229,7 +229,7 @@ def main(args=None):
 
     print("\n" + "="*65)
     print("  KuroSiwo Dataset: https://github.com/Orion-AI-Lab/KuroSiwo")
-    print("  Train weights:    jupyter notebook p2_ai/notebooks/01_unet_training.ipynb")
+    print("  Train weights:    jupyter notebook backend.triage/notebooks/01_unet_training.ipynb")
     print("="*65 + "\n")
 
 

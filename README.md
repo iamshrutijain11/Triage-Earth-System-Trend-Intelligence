@@ -61,7 +61,7 @@ TRIAGE/
 └── run_case_study.py             # CLI case-study runner -> backend/triage
 ```
 
-> **Backward Compatibility Guarantee**: All historical import paths (`p1_data`, `p2_ai`, `p3_terrain`, `p4_app`, `src`, `shared`, `trend_engine`, `nasa_data`) are fully preserved via compatibility shims. Existing tests, scripts, and external tools continue to function without alteration.
+> **Modern Clean Architecture**: The project has been fully refactored into canonical `frontend/` and `backend/` packages. All duplicate directories and legacy phase folders (`p1_data`, `p2_ai`, `p3_terrain`, `p4_app`, `src`, `app`) have been removed. All tests (127/127 passing) import cleanly from `backend` and `frontend`.
 
 ---
 

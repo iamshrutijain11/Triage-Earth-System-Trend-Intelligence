@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 import numpy as np
 
-from p4_app.damage.overlay import (
+from backend.triage.damage.overlay import (
     DamageOverlayResult,
     assess_bridge_damage,
     assess_building_damage,

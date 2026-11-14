@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from p4_app.network.cutoff import SettlementIsolation
+from backend.triage.network.cutoff import SettlementIsolation
 
 logger = logging.getLogger(__name__)
 

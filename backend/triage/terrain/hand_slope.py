@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 import numpy as np
 from scipy.ndimage import distance_transform_edt, uniform_filter
 
-from p2_ai.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
+from backend.triage.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
 
 logger = logging.getLogger(__name__)
 

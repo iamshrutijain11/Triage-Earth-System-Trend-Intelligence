@@ -3,9 +3,9 @@
 import sys
 
 try:
-    from p3_terrain.rescue.trapped_risk import main
+    from backend.triage.rescue.trapped_risk import main
 except ImportError:
-    from src.rescue.trapped_risk import main
+    from backend.triage.rescue.trapped_risk import main
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "data/mock_run"

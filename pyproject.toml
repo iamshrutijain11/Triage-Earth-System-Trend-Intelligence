@@ -59,15 +59,16 @@ dev = [
 ]
 
 [project.scripts]
-triage = "p1_data.pipeline:main"
+triage = "backend.triage.pipeline:main"
 triage-case-study = "run_case_study:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["frontend*", "backend*", "p1_data*", "p2_ai*", "p3_terrain*", "p4_app*", "shared*", "src*", "app*", "trend_engine*", "nasa_data*"]
+include = ["frontend*", "backend*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = [".", "backend"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 

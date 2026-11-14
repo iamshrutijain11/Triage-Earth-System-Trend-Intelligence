@@ -15,9 +15,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-from p4_app.network.cutoff import SettlementIsolation
-from p3_terrain.rescue.dry_islands import check_settlement_on_dry_island
-from p3_terrain.rescue.escape_time import EscapeTimeCheck
+from backend.triage.network.cutoff import SettlementIsolation
+from backend.triage.rescue.dry_islands import check_settlement_on_dry_island
+from backend.triage.rescue.escape_time import EscapeTimeCheck
 
 logger = logging.getLogger(__name__)
 
@@ -267,13 +267,13 @@ def main(run_dir_str: str = "data/mock_run") -> None:
     """CLI runner to execute dry island extraction, HLZ detection, and rescue prioritization."""
     from PIL import Image
     try:
-        from p3_terrain.rescue.dry_islands import identify_dry_islands
-        from p3_terrain.rescue.escape_time import compute_high_ground_mask, evaluate_settlement_escape_time
-        from p3_terrain.rescue.landing_zones import detect_landing_zones, export_landing_zones_geojson
+        from backend.triage.rescue.dry_islands import identify_dry_islands
+        from backend.triage.rescue.escape_time import compute_high_ground_mask, evaluate_settlement_escape_time
+        from backend.triage.rescue.landing_zones import detect_landing_zones, export_landing_zones_geojson
     except ImportError:
-        from src.rescue.dry_islands import identify_dry_islands
-        from src.rescue.escape_time import compute_high_ground_mask, evaluate_settlement_escape_time
-        from src.rescue.landing_zones import detect_landing_zones, export_landing_zones_geojson
+        from backend.triage.rescue.dry_islands import identify_dry_islands
+        from backend.triage.rescue.escape_time import compute_high_ground_mask, evaluate_settlement_escape_time
+        from backend.triage.rescue.landing_zones import detect_landing_zones, export_landing_zones_geojson
 
     run_dir = Path(run_dir_str)
     if not run_dir.exists():

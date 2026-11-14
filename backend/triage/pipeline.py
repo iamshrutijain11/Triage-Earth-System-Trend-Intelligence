@@ -11,7 +11,7 @@ from typing import Any, Dict, Optional, Tuple
 import numpy as np
 
 # Phase 1: Fetch
-from p1_data.fetch import (
+from backend.triage.fetch import (
     DEMData,
     OSMData,
     S1DataPair,
@@ -23,7 +23,7 @@ from p1_data.fetch import (
 )
 
 # Phase 2 & 8: Detection & U-Net
-from p2_ai.detect import (
+from backend.triage.detect import (
     detect_debris_amplitude_fallback,
     detect_water_sar,
     fuse_detections,
@@ -31,7 +31,7 @@ from p2_ai.detect import (
 )
 
 # Phase 3: Terrain filter
-from p3_terrain.terrain import (
+from backend.triage.terrain import (
     build_cant_see_mask,
     compute_hand,
     compute_radar_shadow_layover,
@@ -40,14 +40,14 @@ from p3_terrain.terrain import (
 )
 
 # Phase 4: Damage overlay
-from p4_app.damage import (
+from backend.triage.damage import (
     DamageOverlayResult,
     compute_damage_overlay,
     save_damage_geojson,
 )
 
 # Phase 5: Road graph cut-off
-from p4_app.network import (
+from backend.triage.network import (
     build_cutoff_table,
     build_road_graph,
     export_cutoff_geojson,
@@ -55,7 +55,7 @@ from p4_app.network import (
 )
 
 # Phase 6: Flowpath trace
-from p3_terrain.flowpath import (
+from backend.triage.flowpath import (
     calculate_settlement_arrival_times,
     compute_d8_flow,
     fill_depressions,
@@ -63,7 +63,7 @@ from p3_terrain.flowpath import (
 )
 
 # Phase 7: Rescue intelligence
-from p3_terrain.rescue import (
+from backend.triage.rescue import (
     compute_high_ground_mask,
     compute_rescue_priorities,
     detect_landing_zones,
@@ -73,7 +73,7 @@ from p3_terrain.rescue import (
 )
 
 # Phase 9: Reporting
-from p4_app.report import (
+from backend.triage.report import (
     generate_situation_reports,
     generate_sms_summary,
 )

@@ -1,13 +1,13 @@
 """Detection modules: SAR change, InSAR coherence / GRD proxy, U-Net AI, and 4-way fusion.
 
 Person 2 (AI & Detection) — Branch: p2-ai
-Owned directories: p2_ai/detect/, p2_ai/notebooks/
+Owned directories: backend.triage/detect/, backend.triage/notebooks/
 """
 
 from typing import Any, Dict, Optional, Tuple
 import numpy as np
 
-from p2_ai.detect.coherence import (
+from backend.triage.detect.coherence import (
     DebrisDetectionResult,
     compute_coherence_proxy,
     compute_complex_coherence,
@@ -15,14 +15,14 @@ from p2_ai.detect.coherence import (
     detect_debris_amplitude_fallback,
     detect_debris_from_coherence,
 )
-from p2_ai.detect.fuse import (
+from backend.triage.detect.fuse import (
     CLASS_BACKGROUND,
     CLASS_DEBRIS,
     CLASS_WATER,
     FusedDetectionResult,
     fuse_detections,
 )
-from p2_ai.detect.sar_change import (
+from backend.triage.detect.sar_change import (
     SARWaterDetectionResult,
     detect_water_sar,
     detect_water_sar_dual_pol,
@@ -31,7 +31,7 @@ from p2_ai.detect.sar_change import (
     preprocess_sar,
     to_db,
 )
-from p2_ai.detect.unet import (
+from backend.triage.detect.unet import (
     UNetInferenceEngine,
     UNetPredictionResult,
     compute_segmentation_metrics,
@@ -51,7 +51,7 @@ def run_detection(
 ) -> FusedDetectionResult:
     """Contract interface: Run SAR change, debris/coherence, U-Net, and multi-sensor fusion."""
     if slope is None and dem_data is not None:
-        from p3_terrain.terrain.hand_slope import compute_slope
+        from backend.triage.terrain.hand_slope import compute_slope
         slope = compute_slope(dem_data.elevation, res_meters=30.0)
     elif slope is None:
         slope = np.zeros(s1_data.post_vv.shape, dtype=np.float32)

@@ -2,9 +2,9 @@
 
 from typing import Any, Dict, Optional, Tuple
 
-from p1_data.fetch.cache import get_cache_key, get_cache_path, load_json_cache, save_json_cache
-from p1_data.fetch.dem import DEMData, DEMMetadata, fetch_dem, generate_synthetic_dem
-from p1_data.fetch.exceptions import (
+from backend.triage.fetch.cache import get_cache_key, get_cache_path, load_json_cache, save_json_cache
+from backend.triage.fetch.dem import DEMData, DEMMetadata, fetch_dem, generate_synthetic_dem
+from backend.triage.fetch.exceptions import (
     CloudCoverExceededError,
     CredentialsError,
     DateConstraintError,
@@ -13,9 +13,9 @@ from p1_data.fetch.exceptions import (
     SceneNotFoundError,
     TriageFetchError,
 )
-from p1_data.fetch.osm import MANDATORY_MAX_SNAPSHOT_DATE, OSMData, fetch_osm, generate_synthetic_osm
-from p1_data.fetch.s1 import S1DataPair, S1SceneMetadata, fetch_s1, generate_synthetic_s1
-from p1_data.fetch.s2 import S2Data, S2SceneMetadata, compute_ndwi, fetch_s2, generate_synthetic_s2
+from backend.triage.fetch.osm import MANDATORY_MAX_SNAPSHOT_DATE, OSMData, fetch_osm, generate_synthetic_osm
+from backend.triage.fetch.s1 import S1DataPair, S1SceneMetadata, fetch_s1, generate_synthetic_s1
+from backend.triage.fetch.s2 import S2Data, S2SceneMetadata, compute_ndwi, fetch_s2, generate_synthetic_s2
 
 
 def get_inputs(

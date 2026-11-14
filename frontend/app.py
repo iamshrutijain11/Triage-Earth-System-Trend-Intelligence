@@ -31,7 +31,7 @@ for candidate in (app_dir, app_dir.parent, app_dir.parent.parent):
         repo_root = candidate
         break
 
-for p in (str(repo_root), str(app_dir), str(repo_root / "p4_app"), str(repo_root / "app")):
+for p in (str(repo_root), str(app_dir), str(repo_root / "backend.triage"), str(repo_root / "app")):
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -49,12 +49,12 @@ try:
     from frontend.views.v_impact import render_impact_view
     from frontend.components import render_footer
 except (ImportError, ModuleNotFoundError):
-    from p4_app.app.views.v_explorer import render_explorer_view
-    from p4_app.app.views.v_trend_lab import render_trend_lab_view
-    from p4_app.app.views.v_statistics import render_statistics_view
-    from p4_app.app.views.v_atlas import render_atlas_view
-    from p4_app.app.views.v_impact import render_impact_view
-    from p4_app.app.components import render_footer
+    from frontend.views.v_explorer import render_explorer_view
+    from frontend.views.v_trend_lab import render_trend_lab_view
+    from frontend.views.v_statistics import render_statistics_view
+    from frontend.views.v_atlas import render_atlas_view
+    from frontend.views.v_impact import render_impact_view
+    from frontend.components import render_footer
 
 # Page configuration
 st.set_page_config(

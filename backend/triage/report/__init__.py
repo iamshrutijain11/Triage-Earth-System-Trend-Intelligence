@@ -1,10 +1,10 @@
 """Reporting modules: bilingual situation reports and radio summaries."""
 
-from p4_app.report.build_report import (
+from backend.triage.report.build_report import (
     format_template_context,
     generate_situation_reports,
 )
-from p4_app.report.sms_summary import (
+from backend.triage.report.sms_summary import (
     ATTRIBUTION_SHORT,
     generate_sms_summary,
 )

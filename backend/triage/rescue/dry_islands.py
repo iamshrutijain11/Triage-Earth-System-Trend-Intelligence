@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Set, Tuple
 import numpy as np
 from scipy.ndimage import label
 
-from p2_ai.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
+from backend.triage.detect.fuse import CLASS_BACKGROUND, CLASS_DEBRIS, CLASS_WATER
 
 logger = logging.getLogger(__name__)
 

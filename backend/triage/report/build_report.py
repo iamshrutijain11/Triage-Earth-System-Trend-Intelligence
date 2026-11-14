@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import jinja2
 
-from p3_terrain.rescue.trapped_risk import RescuePriorityItem
+from backend.triage.rescue.trapped_risk import RescuePriorityItem
 
 logger = logging.getLogger(__name__)
 

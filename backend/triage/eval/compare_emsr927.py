@@ -15,8 +15,8 @@ from typing import Any, Dict, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 
-from p2_ai.detect.unet import compute_segmentation_metrics
-from p4_app.report.sms_summary import ATTRIBUTION_SHORT
+from backend.triage.detect.unet import compute_segmentation_metrics
+from backend.triage.report.sms_summary import ATTRIBUTION_SHORT
 
 logger = logging.getLogger(__name__)
 
