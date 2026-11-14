@@ -31,7 +31,7 @@ import shutil
 import sys
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parent
+repo_root = Path(__file__).resolve().parent if (Path(__file__).resolve().parent / "backend").exists() else Path(__file__).resolve().parent.parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
@@ -45,7 +45,7 @@ logging.basicConfig(
 logger = logging.getLogger("case_study")
 
 # ─── KuroSiwo model availability check ───────────────────────────────────────
-_MODELS_DIR = repo_root / "backend.triage" / "models"
+_MODELS_DIR = repo_root / "data" / "models"
 _ONNX_PATH = _MODELS_DIR / "unet_flood.onnx"
 _PTH_PATH = _MODELS_DIR / "unet_flood_best.pth"
 

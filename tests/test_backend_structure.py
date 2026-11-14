@@ -89,3 +89,11 @@ def test_frontend_presentation_tier():
     assert hasattr(v_statistics, "render_statistics_view")
     assert hasattr(v_atlas, "render_atlas_view")
     assert hasattr(v_impact, "render_impact_view")
+
+
+def test_scripts_cli_runner():
+    """Verify scripts module exports case study runner."""
+    import scripts
+    from scripts import run_case_study
+
+    assert hasattr(run_case_study, "main")

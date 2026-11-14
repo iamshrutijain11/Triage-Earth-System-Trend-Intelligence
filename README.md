@@ -54,14 +54,15 @@ TRIAGE/
 │       └── io.py
 │
 ├── data/                         # Verified Data & Model Assets (runs, cache, models)
-├── docs/                         # Scientific Methodology & User Documentation
-├── tests/                        # 127 Comprehensive Tests (100% Pass Rate)
-├── scripts/                      # Downloader & benchmark runner utilities
-├── streamlit_app.py              # Root deployment entrypoint -> frontend/app.py
-└── run_case_study.py             # CLI case-study runner -> backend/triage
+├── docker/                       # Docker & container orchestration (Dockerfile, compose)
+├── docs/                         # Scientific Methodology, Notebooks, Attributions & Contracts
+├── frontend/                     # Streamlit Presentation Tier (App, components, views)
+├── scripts/                      # Downloader & case-study runner scripts (run_case_study.py)
+├── tests/                        # 128 Comprehensive Tests (100% Pass Rate across domains)
+└── streamlit_app.py              # Root deployment entrypoint -> frontend/app.py
 ```
 
-> **Modern Clean Architecture**: The project has been fully refactored into canonical `frontend/` and `backend/` packages. All duplicate directories and legacy phase folders (`p1_data`, `p2_ai`, `p3_terrain`, `p4_app`, `src`, `app`) have been removed. All tests (127/127 passing) import cleanly from `backend` and `frontend`.
+> **Modern Clean Architecture**: The project is organized into dedicated, non-overlapping directories (`frontend/`, `backend/`, `data/`, `docs/`, `docker/`, `scripts/`, `tests/`). All 128 tests pass with a 100% pass rate.
 
 ---
 
@@ -204,13 +205,13 @@ print("Top Priority Rescue:", results["rescue_priorities"][0].settlement_name)
 
 You can also run the pipeline CLI directly:
 ```bash
-python -m p1_data.pipeline
+python -m backend.triage.pipeline
 ```
 
 ### 2. Run the Case Study
 To run the Trishuli corridor (26 Aug 2026) case study and generate post-hoc Copernicus EMS (EMSR927) validation metrics:
 ```bash
-python run_case_study.py
+python scripts/run_case_study.py
 ```
 
 ### 3. Launch the Interactive Dashboard
@@ -218,7 +219,7 @@ To launch the Streamlit decision-support application:
 ```bash
 streamlit run streamlit_app.py
 ```
-*(Or alternatively `streamlit run app/main.py`)*
+*(Or alternatively `streamlit run frontend/app.py`)*
 
 Dashboard features:
 - Area & date picker with scenario presets

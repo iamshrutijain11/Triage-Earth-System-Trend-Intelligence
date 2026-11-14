@@ -60,11 +60,11 @@ dev = [
 
 [project.scripts]
 triage = "backend.triage.pipeline:main"
-triage-case-study = "run_case_study:main"
+triage-case-study = "scripts.run_case_study:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["frontend*", "backend*"]
+include = ["frontend*", "backend*", "scripts*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
