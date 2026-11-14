@@ -1,21 +1,63 @@
 """
 NASA Earth Observation Data Module.
 
-Provides access to real and curated NASA Earth-science datasets for trend analysis:
-- Precipitation (GPM IMERG, MERRA-2)
-- Surface Air Temperature (AIRS, MERRA-2)
-- Soil Moisture (SMAP, MERRA-2)
-- Vegetation Index (MODIS NDVI)
-- Solar Irradiance & Energy Flux (CERES, NASA POWER)
+Provides modular, provenance-tracked access to NASA Earth-science observation systems:
+- NASA POWER API (MERRA-2 atmospheric assimilation & CERES solar insolation)
+- NASA GPM IMERG (Global multi-satellite precipitation constellation)
+- NASA GLDAS (Noah/Catchment land surface hydrology model)
+
+Adheres strictly to NASA Open Data Policy standards:
+- Explicit distinction between satellite observations and reanalysis models
+- Missing values (-999.0 sentinels) preserved as NaNs without silent imputation
+- Strict provenance tracking and local query caching
 """
 
-from nasa_data.catalog import NASA_CATALOG, VariableMetadata
+from nasa_data.catalog import NASA_CATALOG, REGIONAL_PRESETS, VariableMetadata
 from nasa_data.client import NASAClient
-from nasa_data.local_store import get_curated_benchmark_series
+from nasa_data.schema import (
+    ObservationRequest,
+    NormalizedObservationSeries,
+    DatasetMetadata,
+    SourceHealth,
+    GeoCoverage,
+    MissingDataSummary,
+    SourceProvenance,
+    ObservationType,
+    RetrievalStatus,
+    HealthStatus,
+)
+from nasa_data.api import (
+    get_available_datasets,
+    get_available_variables,
+    get_available_regions,
+    get_dataset_metadata,
+    fetch_historical_data,
+    check_data_source_health,
+)
 
 __all__ = [
+    # Catalog & Metadata
     "NASA_CATALOG",
+    "REGIONAL_PRESETS",
     "VariableMetadata",
+    "DatasetMetadata",
+    "SourceHealth",
+    "GeoCoverage",
+    "MissingDataSummary",
+    "SourceProvenance",
+    "ObservationType",
+    "RetrievalStatus",
+    "HealthStatus",
+    # Request & Response Contracts
+    "ObservationRequest",
+    "NormalizedObservationSeries",
+    # Public API Endpoints
+    "get_available_datasets",
+    "get_available_variables",
+    "get_available_regions",
+    "get_dataset_metadata",
+    "fetch_historical_data",
+    "check_data_source_health",
+    # Legacy client compatibility
     "NASAClient",
-    "get_curated_benchmark_series",
 ]
